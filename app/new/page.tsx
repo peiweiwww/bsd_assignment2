@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useWorkouts } from "@/lib/workout-context";
 import { localISO } from "@/lib/utils";
@@ -285,7 +285,7 @@ function CardioExerciseBlock({
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
-export default function NewWorkoutPage() {
+function NewWorkoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addWorkout } = useWorkouts();
@@ -552,5 +552,13 @@ export default function NewWorkoutPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function NewWorkoutPage() {
+  return (
+    <Suspense>
+      <NewWorkoutForm />
+    </Suspense>
   );
 }
