@@ -1,10 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import { getTodayWorkout, getRecentWorkouts } from "@/lib/sample-data";
+import { useWorkouts } from "@/lib/workout-context";
 import { WEEKLY_PLAN, WorkoutEntry, isCardioExercise } from "@/lib/types";
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────────────────────
 
-const WORKOUT_COLORS: Record<string, string> = {
+export const WORKOUT_COLORS: Record<string, string> = {
   shoulder: "bg-violet-500/15 text-violet-300 border-violet-500/30",
   leg:      "bg-blue-500/15   text-blue-300   border-blue-500/30",
   back:     "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
@@ -12,7 +14,7 @@ const WORKOUT_COLORS: Record<string, string> = {
   rest:     "bg-zinc-700/40   text-zinc-400    border-zinc-600/40",
 };
 
-const WORKOUT_ICONS: Record<string, string> = {
+export const WORKOUT_ICONS: Record<string, string> = {
   shoulder: "🏋️",
   leg:      "🦵",
   back:     "💪",
@@ -20,7 +22,9 @@ const WORKOUT_ICONS: Record<string, string> = {
   rest:     "😴",
 };
 
-function formatDate(isoDate: string): string {
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+export function formatDate(isoDate: string): string {
   const [year, month, day] = isoDate.split("-").map(Number);
   return new Date(year, month - 1, day).toLocaleDateString("en-US", {
     weekday: "long",
@@ -59,7 +63,7 @@ function TodayPlan({ dayOfWeek }: { dayOfWeek: number }) {
   );
 }
 
-function ExerciseCard({ entry }: { entry: WorkoutEntry }) {
+export function WorkoutCard({ entry }: { entry: WorkoutEntry }) {
   const colorClass = WORKOUT_COLORS[entry.type] ?? WORKOUT_COLORS.rest;
   const icon = WORKOUT_ICONS[entry.type] ?? "📅";
 
@@ -71,7 +75,7 @@ function ExerciseCard({ entry }: { entry: WorkoutEntry }) {
           <span className="text-lg">{icon}</span>
           <span className="font-semibold text-zinc-100 capitalize">{entry.type}</span>
           <span className={`ml-1 rounded-full border px-2 py-0.5 text-xs font-medium ${colorClass}`}>
-            {entry.exercises.length} exercises
+            {entry.exercises.length} exercise{entry.exercises.length !== 1 ? "s" : ""}
           </span>
         </div>
         <Link
@@ -131,12 +135,14 @@ function ExerciseCard({ entry }: { entry: WorkoutEntry }) {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const { getByDate, getRecent } = useWorkouts();
+
   const now = new Date();
   const today = now.toISOString().split("T")[0];
   const dayOfWeek = now.getDay();
 
-  const todayEntry = getTodayWorkout();
-  const recentWorkouts = getRecentWorkouts(4);
+  const todayEntry = getByDate(today);
+  const recentWorkouts = getRecent(5).filter((w) => w.date !== today);
 
   const todayFormatted = now.toLocaleDateString("en-US", {
     weekday: "long",
@@ -166,7 +172,7 @@ export default function HomePage() {
           <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-3">
             Today&apos;s Log
           </h2>
-          <ExerciseCard entry={todayEntry} />
+          <WorkoutCard entry={todayEntry} />
         </section>
       ) : (
         <div className="rounded-2xl border border-dashed border-zinc-700 px-5 py-8 text-center">
@@ -181,28 +187,28 @@ export default function HomePage() {
       )}
 
       {/* Recent workouts */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-500">
-            Recent Workouts
-          </h2>
-          <Link
-            href="/week"
-            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-          >
-            Week view →
-          </Link>
-        </div>
-        <ul className="space-y-4">
-          {recentWorkouts
-            .filter((w) => w.date !== today)
-            .map((entry) => (
+      {recentWorkouts.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-500">
+              Recent Workouts
+            </h2>
+            <Link
+              href="/week"
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              Week view →
+            </Link>
+          </div>
+          <ul className="space-y-4">
+            {recentWorkouts.map((entry) => (
               <li key={entry.id}>
-                <ExerciseCard entry={entry} />
+                <WorkoutCard entry={entry} />
               </li>
             ))}
-        </ul>
-      </section>
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
