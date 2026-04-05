@@ -10,29 +10,29 @@ import { localISO } from "@/lib/utils";
 
 const WORKOUT_COLORS: Record<string, { card: string; badge: string; dot: string }> = {
   shoulder: {
-    card:  "border-violet-500/40 bg-violet-500/8 hover:border-violet-500/60 hover:bg-violet-500/12",
-    badge: "bg-violet-500/20 text-violet-300",
-    dot:   "bg-violet-400",
+    card:  "border-violet-200 bg-violet-50 hover:border-violet-300 hover:bg-violet-100/60",
+    badge: "bg-violet-100 text-violet-700",
+    dot:   "bg-violet-500",
   },
   leg: {
-    card:  "border-blue-500/40 bg-blue-500/8 hover:border-blue-500/60 hover:bg-blue-500/12",
-    badge: "bg-blue-500/20 text-blue-300",
-    dot:   "bg-blue-400",
+    card:  "border-sky-200 bg-sky-50 hover:border-sky-300 hover:bg-sky-100/60",
+    badge: "bg-sky-100 text-sky-700",
+    dot:   "bg-sky-500",
   },
   back: {
-    card:  "border-emerald-500/40 bg-emerald-500/8 hover:border-emerald-500/60 hover:bg-emerald-500/12",
-    badge: "bg-emerald-500/20 text-emerald-300",
-    dot:   "bg-emerald-400",
+    card:  "border-emerald-200 bg-emerald-50 hover:border-emerald-300 hover:bg-emerald-100/60",
+    badge: "bg-emerald-100 text-emerald-700",
+    dot:   "bg-emerald-500",
   },
   cardio: {
-    card:  "border-orange-500/40 bg-orange-500/8 hover:border-orange-500/60 hover:bg-orange-500/12",
-    badge: "bg-orange-500/20 text-orange-300",
-    dot:   "bg-orange-400",
+    card:  "border-orange-200 bg-orange-50 hover:border-orange-300 hover:bg-orange-100/60",
+    badge: "bg-orange-100 text-orange-700",
+    dot:   "bg-orange-500",
   },
   rest: {
-    card:  "border-zinc-800 bg-zinc-900/20 hover:border-zinc-700",
-    badge: "bg-zinc-700/50 text-zinc-500",
-    dot:   "bg-zinc-600",
+    card:  "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/60",
+    badge: "bg-slate-100 text-slate-400",
+    dot:   "bg-slate-400",
   },
 };
 
@@ -48,7 +48,7 @@ const WORKOUT_ICONS: Record<string, string> = {
 
 function getMondayOf(date: Date): Date {
   const d = new Date(date);
-  const day = d.getDay(); // 0=Sun
+  const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
@@ -123,22 +123,21 @@ function DayCard({
   const dayNum    = date.getDate();
   const monthAbbr = date.toLocaleDateString("en-US", { month: "short" });
 
-  // Summary line
   let summary: React.ReactNode = null;
   if (entry) {
     if (entry.type === "rest") {
-      summary = <span className="text-zinc-600 text-xs">Rest logged</span>;
+      summary = <span className="text-slate-400 text-xs">Rest logged</span>;
     } else if (entry.type === "cardio") {
       const dur = totalDuration(entry);
       summary = (
-        <span className="text-xs text-zinc-400 tabular-nums">
+        <span className="text-xs text-slate-500 tabular-nums">
           {entry.exercises.length} activity{entry.exercises.length !== 1 ? "s" : ""} · {dur} min
         </span>
       );
     } else {
       const vol = totalVolume(entry);
       summary = (
-        <span className="text-xs text-zinc-400 tabular-nums">
+        <span className="text-xs text-slate-500 tabular-nums">
           {entry.exercises.length} ex
           {vol > 0 && <> · {(vol / 1000).toFixed(1)}k lb</>}
         </span>
@@ -152,28 +151,28 @@ function DayCard({
       className={`
         relative flex flex-col gap-2.5 rounded-2xl border p-4
         min-h-[160px] transition-all duration-200
-        hover:scale-[1.03] hover:shadow-lg hover:shadow-black/40 hover:-translate-y-0.5
+        hover:scale-[1.03] hover:shadow-md hover:-translate-y-0.5
         ${colors.card}
-        ${isFuture ? "opacity-35" : ""}
-        ${isToday ? "ring-2 ring-white/25 shadow-md shadow-black/30" : ""}
+        ${isFuture ? "opacity-40" : ""}
+        ${isToday ? "ring-2 ring-sky-400 shadow-md shadow-sky-100" : "shadow-sm"}
       `}
     >
       {/* Today pill */}
       {isToday && (
-        <span className="absolute top-3 right-3 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-widest backdrop-blur-sm">
+        <span className="absolute top-3 right-3 rounded-full bg-sky-500 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-widest">
           Today
         </span>
       )}
 
       {/* Date */}
       <div>
-        <p className={`text-xs font-bold uppercase tracking-widest ${isRest ? "text-zinc-700" : "text-zinc-500"}`}>
+        <p className={`text-xs font-bold uppercase tracking-widest ${isRest ? "text-slate-400" : "text-slate-500"}`}>
           {dayName}
         </p>
-        <p className={`text-3xl font-extrabold leading-none mt-0.5 ${isRest ? "text-zinc-700" : "text-white"}`}>
+        <p className={`text-3xl font-extrabold leading-none mt-0.5 ${isRest ? "text-slate-400" : "text-slate-900"}`}>
           {dayNum}
         </p>
-        <p className={`text-xs mt-0.5 font-medium ${isRest ? "text-zinc-800" : "text-zinc-600"}`}>
+        <p className={`text-xs mt-0.5 font-medium ${isRest ? "text-slate-400" : "text-slate-500"}`}>
           {monthAbbr}
         </p>
       </div>
@@ -192,7 +191,7 @@ function DayCard({
           </div>
         ) : (
           !isFuture && (
-            <p className="text-xs text-zinc-700">Not logged</p>
+            <p className="text-xs text-slate-400">Not logged</p>
           )
         )}
       </div>
@@ -205,11 +204,9 @@ function DayCard({
 export default function WeekPage() {
   const { getByDate } = useWorkouts();
 
-  // ✅ Use localISO to avoid UTC-shift bug
   const todayISO = localISO(new Date());
   const [weekStart, setWeekStart] = useState<Date>(() => getMondayOf(new Date()));
 
-  // weekDates: Mon(+0) … Sun(+6)
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const sunday    = weekDates[6];
   const today     = parseLocalDate(todayISO);
@@ -221,7 +218,6 @@ export default function WeekPage() {
   const trainDays = weekEntries.filter((e) => e.type !== "rest").length;
   const totalVol  = weekEntries.reduce((acc, e) => acc + totalVolume(e), 0);
 
-  // Estimated total workout time: 60 min per strength session, actual duration for cardio
   const STRENGTH_TYPES = new Set(["shoulder", "leg", "back"]);
   const estMinutes = weekEntries.reduce((acc, e) => {
     if (STRENGTH_TYPES.has(e.type)) return acc + 60;
@@ -245,37 +241,37 @@ export default function WeekPage() {
     <div className="space-y-8 animate-fade-up">
       {/* Header */}
       <div className="pt-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
           Overview
         </p>
-        <h1 className="text-5xl font-extrabold tracking-tight text-white leading-none">Week</h1>
+        <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 leading-none">Week</h1>
       </div>
 
       {/* Week navigation */}
       <div className="flex items-center justify-between">
         <button
           onClick={prevWeek}
-          className="flex items-center gap-1.5 rounded-xl border border-zinc-700 px-3.5 py-2 text-sm font-medium text-zinc-400 hover:border-zinc-500 hover:text-white hover:bg-zinc-800/50 active:scale-95 transition-all duration-150"
+          className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 hover:border-slate-400 hover:text-slate-900 hover:bg-slate-50 active:scale-95 transition-all duration-150 shadow-sm"
         >
           ← Prev
         </button>
 
         <div className="text-center">
-          <p className="text-sm font-bold text-zinc-200">
+          <p className="text-sm font-bold text-slate-800">
             {formatMonthRange(weekStart, sunday)}
           </p>
           {isCurrentWeek && (
-            <p className="text-xs text-zinc-600 mt-0.5">Current week</p>
+            <p className="text-xs text-slate-400 mt-0.5">Current week</p>
           )}
         </div>
 
         <button
           onClick={nextWeek}
           disabled={isFutureWeek}
-          className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-150 ${
+          className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-150 shadow-sm ${
             isFutureWeek
-              ? "border-zinc-800 text-zinc-700 cursor-not-allowed"
-              : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white hover:bg-zinc-800/50 active:scale-95"
+              ? "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed"
+              : "border-slate-300 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-900 hover:bg-slate-50 active:scale-95"
           }`}
         >
           Next →
@@ -292,22 +288,22 @@ export default function WeekPage() {
           ].map(({ label, value, sub }) => (
             <div
               key={label}
-              className="rounded-2xl border border-zinc-800 bg-zinc-900/80 px-4 py-3.5 text-center"
+              className="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-blue-50 px-4 py-3.5 text-center shadow-sm"
             >
-              <p className="text-2xl font-extrabold text-white tabular-nums">{value}</p>
-              <p className="text-xs text-zinc-600 mt-1 font-medium">{sub}</p>
+              <p className="text-2xl font-extrabold text-sky-700 tabular-nums">{value}</p>
+              <p className="text-xs text-sky-500/80 mt-1 font-semibold uppercase tracking-wider">{sub}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* 7-day grid — fixed 2-col on mobile, 4-col on sm+ so all 7 show well */}
+      {/* 7-day grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {weekDates.map((date) => {
-          const iso     = localISO(date);
-          const isToday = iso === todayISO;                // ✅ both use localISO now
+          const iso      = localISO(date);
+          const isToday  = iso === todayISO;
           const isFuture = date > today;
-          const entry   = getByDate(iso);
+          const entry    = getByDate(iso);
 
           return (
             <DayCard
@@ -322,11 +318,11 @@ export default function WeekPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-x-5 gap-y-2 pt-2 border-t border-zinc-800/60">
+      <div className="flex flex-wrap gap-x-5 gap-y-2 pt-2 border-t border-slate-200">
         {(["shoulder", "leg", "back", "cardio", "rest"] as const).map((type) => (
           <div key={type} className="flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${WORKOUT_COLORS[type].dot}`} />
-            <span className="text-xs text-zinc-600 font-medium">
+            <span className="text-xs text-slate-500 font-medium">
               {WEEKLY_PLAN[
                 type === "shoulder" ? 1
                 : type === "leg"    ? 4

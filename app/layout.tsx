@@ -29,7 +29,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <NavBar />
 
         {/* Page content */}
@@ -38,7 +38,7 @@ export default function RootLayout({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-zinc-800/60 py-5 text-center text-xs text-zinc-700 tracking-wide">
+        <footer className="border-t border-slate-200 py-5 text-center text-xs text-slate-400 tracking-wide">
           Keep showing up. 💪
         </footer>
       </body>
