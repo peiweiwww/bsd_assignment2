@@ -94,15 +94,6 @@ export const sampleWorkouts: WorkoutEntry[] = [
       // Abs
       {
         id: "e8",
-        name: "Hanging Leg Raise",
-        sets: [
-          { reps: 15, weight: 0 },
-          { reps: 12, weight: 0 },
-          { reps: 12, weight: 0 },
-        ],
-      },
-      {
-        id: "e8b",
         name: "Plank",
         sets: [
           { reps: 1, weight: 0 },
@@ -111,12 +102,12 @@ export const sampleWorkouts: WorkoutEntry[] = [
         ],
       },
       {
-        id: "e8c",
-        name: "Cable Crunch",
+        id: "e8b",
+        name: "Russian Twist",
         sets: [
-          { reps: 15, weight: 50 },
-          { reps: 15, weight: 50 },
-          { reps: 12, weight: 55 },
+          { reps: 20, weight: 25 },
+          { reps: 20, weight: 25 },
+          { reps: 15, weight: 25 },
         ],
       },
     ],
@@ -131,14 +122,14 @@ export const sampleWorkouts: WorkoutEntry[] = [
       {
         id: "e9",
         name: "Treadmill Run",
-        duration: 25,
+        duration: 20,
         notes: "Maintained 6.5 mph, felt strong",
       },
       {
         id: "e10",
         name: "Rowing Machine",
-        duration: 10,
-        notes: "Cooldown pace, 500m splits ~2:10",
+        duration: 25,
+        notes: "Steady pace, 500m splits ~2:10",
       },
     ],
   },
@@ -179,28 +170,20 @@ export const sampleWorkouts: WorkoutEntry[] = [
       // Abs
       {
         id: "e14",
-        name: "Plank",
+        name: "Ab Rollout",
         sets: [
-          { reps: 1, weight: 0 },
-          { reps: 1, weight: 0 },
+          { reps: 12, weight: 0 },
+          { reps: 10, weight: 0 },
+          { reps: 10, weight: 0 },
         ],
       },
       {
         id: "e14b",
-        name: "Hanging Leg Raise",
+        name: "Bicycle Crunch",
         sets: [
+          { reps: 20, weight: 0 },
+          { reps: 20, weight: 0 },
           { reps: 15, weight: 0 },
-          { reps: 12, weight: 0 },
-          { reps: 12, weight: 0 },
-        ],
-      },
-      {
-        id: "e14c",
-        name: "Russian Twist",
-        sets: [
-          { reps: 20, weight: 25 },
-          { reps: 20, weight: 25 },
-          { reps: 15, weight: 25 },
         ],
       },
     ],
@@ -242,20 +225,20 @@ export const sampleWorkouts: WorkoutEntry[] = [
       // Abs
       {
         id: "e18",
-        name: "Hanging Leg Raise",
+        name: "Ab Rollout",
         sets: [
-          { reps: 15, weight: 0 },
           { reps: 12, weight: 0 },
-          { reps: 12, weight: 0 },
+          { reps: 10, weight: 0 },
+          { reps: 10, weight: 0 },
         ],
       },
       {
         id: "e19",
-        name: "Russian Twist",
+        name: "Bicycle Crunch",
         sets: [
-          { reps: 20, weight: 25 },
-          { reps: 20, weight: 25 },
-          { reps: 15, weight: 25 },
+          { reps: 20, weight: 0 },
+          { reps: 20, weight: 0 },
+          { reps: 15, weight: 0 },
         ],
       },
     ],

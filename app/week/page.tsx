@@ -221,11 +221,11 @@ export default function WeekPage() {
   const trainDays = weekEntries.filter((e) => e.type !== "rest").length;
   const totalVol  = weekEntries.reduce((acc, e) => acc + totalVolume(e), 0);
 
-  // Estimated total workout time: 60 min per strength session, 45 min per cardio
+  // Estimated total workout time: 60 min per strength session, actual duration for cardio
   const STRENGTH_TYPES = new Set(["shoulder", "leg", "back"]);
   const estMinutes = weekEntries.reduce((acc, e) => {
     if (STRENGTH_TYPES.has(e.type)) return acc + 60;
-    if (e.type === "cardio") return acc + 45;
+    if (e.type === "cardio") return acc + totalDuration(e);
     return acc;
   }, 0);
   const estHours = Math.floor(estMinutes / 60);
