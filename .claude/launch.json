@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "workout-tracker",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "PATH=/tmp:/opt/homebrew/bin:$PATH exec node '/Users/happxy/Desktop/taking_classes/quarter3/build ship design/week2/assignment2/workout-tracker/node_modules/.bin/next' dev"],
+      "port": 3000
+    }
+  ]
+}
