@@ -33,24 +33,34 @@ interface FormCardioExercise {
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const WORKOUT_TYPES: { value: WorkoutType; label: string; icon: string }[] = [
-  { value: "shoulder", label: "Shoulder + Abs", icon: "🏋️" },
-  { value: "leg",      label: "Leg + Abs",      icon: "🦵" },
-  { value: "back",     label: "Back + Abs",     icon: "💪" },
-  { value: "cardio",   label: "Cardio",         icon: "🏃" },
-  { value: "rest",     label: "Rest Day",       icon: "😴" },
+const WORKOUT_TYPES: { value: WorkoutType; label: string; icon: string; sub: string }[] = [
+  { value: "shoulder", label: "Shoulder",  icon: "🏋️", sub: "+ Abs"   },
+  { value: "leg",      label: "Leg",       icon: "🦵", sub: "+ Abs"   },
+  { value: "back",     label: "Back",      icon: "💪", sub: "+ Abs"   },
+  { value: "cardio",   label: "Cardio",    icon: "🏃", sub: "Cardio"  },
+  { value: "rest",     label: "Rest Day",  icon: "😴", sub: "Recovery"},
 ];
 
-const TYPE_COLORS: Record<WorkoutType, string> = {
-  shoulder: "border-violet-400 bg-violet-50 text-violet-700",
-  leg:      "border-sky-400    bg-sky-50    text-sky-700",
-  back:     "border-emerald-400 bg-emerald-50 text-emerald-700",
-  cardio:   "border-orange-400 bg-orange-50  text-orange-700",
-  rest:     "border-slate-300  bg-slate-100  text-slate-500",
+// Active state: colored background + border
+const TYPE_COLORS_ACTIVE: Record<WorkoutType, string> = {
+  shoulder: "border-violet-400 bg-gradient-to-b from-violet-50 to-violet-100/80 text-violet-800 shadow-sm shadow-violet-100",
+  leg:      "border-sky-400    bg-gradient-to-b from-sky-50    to-sky-100/80    text-sky-800    shadow-sm shadow-sky-100",
+  back:     "border-emerald-400 bg-gradient-to-b from-emerald-50 to-emerald-100/80 text-emerald-800 shadow-sm shadow-emerald-100",
+  cardio:   "border-orange-400 bg-gradient-to-b from-orange-50 to-orange-100/80 text-orange-800 shadow-sm shadow-orange-100",
+  rest:     "border-slate-300  bg-gradient-to-b from-slate-50  to-slate-100/80  text-slate-600  shadow-sm",
 };
 
 const TYPE_COLORS_INACTIVE =
-  "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700";
+  "border-slate-200 bg-white text-slate-400 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-600";
+
+// Left border accent for exercise blocks
+const EXERCISE_ACCENT: Record<WorkoutType, string> = {
+  shoulder: "border-l-violet-400",
+  leg:      "border-l-sky-400",
+  back:     "border-l-emerald-400",
+  cardio:   "border-l-orange-400",
+  rest:     "border-l-slate-300",
+};
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -119,16 +129,20 @@ function SetRow({
 function StrengthExerciseBlock({
   exercise,
   index,
+  workoutType,
   onChange,
   onRemove,
   canRemove,
 }: {
   exercise: FormStrengthExercise;
   index: number;
+  workoutType: WorkoutType;
   onChange: (updated: FormStrengthExercise) => void;
   onRemove: () => void;
   canRemove: boolean;
 }) {
+  const accentClass = EXERCISE_ACCENT[workoutType] ?? "border-l-slate-300";
+
   function updateSet(setIndex: number, field: keyof FormSet, value: string) {
     const sets = exercise.sets.map((s, i) =>
       i === setIndex ? { ...s, [field]: value } : s
@@ -149,7 +163,7 @@ function StrengthExerciseBlock({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3 transition-colors hover:border-slate-300 shadow-sm">
+    <div className={`rounded-xl border-l-4 border border-slate-200 bg-white p-4 space-y-3 transition-colors hover:border-slate-300 shadow-sm ${accentClass}`}>
       {/* Exercise header */}
       <div className="flex items-center gap-2">
         <span className="text-xs text-slate-400 font-mono shrink-0">#{index + 1}</span>
@@ -206,18 +220,22 @@ function StrengthExerciseBlock({
 function CardioExerciseBlock({
   exercise,
   index,
+  workoutType,
   onChange,
   onRemove,
   canRemove,
 }: {
   exercise: FormCardioExercise;
   index: number;
+  workoutType: WorkoutType;
   onChange: (updated: FormCardioExercise) => void;
   onRemove: () => void;
   canRemove: boolean;
 }) {
+  const accentClass = EXERCISE_ACCENT[workoutType] ?? "border-l-slate-300";
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3 transition-colors hover:border-slate-300 shadow-sm">
+    <div className={`rounded-xl border-l-4 border border-slate-200 bg-white p-4 space-y-3 transition-colors hover:border-slate-300 shadow-sm ${accentClass}`}>
       <div className="flex items-center gap-2">
         <span className="text-xs text-slate-400 font-mono shrink-0">#{index + 1}</span>
         <input
@@ -390,13 +408,18 @@ export default function NewWorkoutPage() {
   const isCardio = workoutType === "cardio";
 
   return (
-    <div className="space-y-8 animate-fade-up">
-      {/* Page header */}
-      <div className="pt-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-          New Entry
-        </p>
-        <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 leading-none">Log Workout</h1>
+    <div className="space-y-8 animate-fade-up bg-gradient-to-b from-sky-50/40 to-transparent -mx-4 px-4 pt-2 pb-2 rounded-b-3xl">
+      {/* Page header with icon */}
+      <div className="pt-4 flex items-center gap-4">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 shadow-md shadow-sky-200 text-2xl shrink-0">
+          📋
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
+            New Entry
+          </p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 leading-none">Log Workout</h1>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -416,20 +439,23 @@ export default function NewWorkoutPage() {
           <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
             Workout Type
           </label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {WORKOUT_TYPES.map(({ value, label, icon }) => {
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {WORKOUT_TYPES.map(({ value, label, icon, sub }) => {
               const active = workoutType === value;
               return (
                 <button
                   key={value}
                   type="button"
                   onClick={() => setWorkoutType(value)}
-                  className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-150 text-left active:scale-95 ${
-                    active ? TYPE_COLORS[value] : TYPE_COLORS_INACTIVE
+                  className={`flex flex-col items-center justify-center gap-1.5 rounded-2xl border-2 px-3 py-4 text-sm font-semibold transition-all duration-150 active:scale-95 ${
+                    active ? TYPE_COLORS_ACTIVE[value] : TYPE_COLORS_INACTIVE
                   }`}
                 >
-                  <span className="text-base">{icon}</span>
-                  <span>{label}</span>
+                  <span className="text-3xl leading-none">{icon}</span>
+                  <span className="font-bold text-[13px] leading-tight">{label}</span>
+                  <span className={`text-[10px] font-medium leading-none ${active ? "opacity-60" : "text-slate-400"}`}>
+                    {sub}
+                  </span>
                 </button>
               );
             })}
@@ -439,7 +465,7 @@ export default function NewWorkoutPage() {
         {/* Exercises — Strength */}
         {isStrength && (
           <section className="space-y-3">
-            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
               Exercises
             </label>
             <div className="space-y-3">
@@ -448,6 +474,7 @@ export default function NewWorkoutPage() {
                   key={ex.id}
                   exercise={ex}
                   index={i}
+                  workoutType={workoutType}
                   onChange={(updated) => updateStrength(i, updated)}
                   onRemove={() => removeStrengthExercise(i)}
                   canRemove={strengthExercises.length > 1}
@@ -467,7 +494,7 @@ export default function NewWorkoutPage() {
         {/* Exercises — Cardio */}
         {isCardio && (
           <section className="space-y-3">
-            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
               Activities
             </label>
             <div className="space-y-3">
@@ -476,6 +503,7 @@ export default function NewWorkoutPage() {
                   key={ex.id}
                   exercise={ex}
                   index={i}
+                  workoutType={workoutType}
                   onChange={(updated) => updateCardio(i, updated)}
                   onRemove={() => removeCardioExercise(i)}
                   canRemove={cardioExercises.length > 1}
@@ -494,7 +522,7 @@ export default function NewWorkoutPage() {
 
         {/* Rest day note */}
         {workoutType === "rest" && (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-500">
+          <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100/60 px-5 py-4 text-sm text-slate-500">
             😴 Rest days are just as important as training days. Good choice!
           </div>
         )}
@@ -507,10 +535,10 @@ export default function NewWorkoutPage() {
         )}
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2 pb-4">
+        <div className="flex gap-3 pt-2 pb-6">
           <button
             type="submit"
-            className="flex-1 rounded-xl bg-sky-500 px-6 py-3 text-sm font-bold text-white hover:bg-sky-600 active:scale-95 transition-all duration-150 shadow-md shadow-sky-200"
+            className="flex-1 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-6 py-3 text-sm font-bold text-white hover:from-sky-600 hover:to-blue-700 active:scale-95 transition-all duration-150 shadow-md shadow-sky-200"
           >
             Save Workout
           </button>

@@ -23,6 +23,24 @@ export const WORKOUT_ICONS: Record<string, string> = {
   rest:     "😴",
 };
 
+// Left-border accent colors per workout type
+const CARD_ACCENT: Record<string, string> = {
+  shoulder: "border-l-violet-400",
+  leg:      "border-l-sky-400",
+  back:     "border-l-emerald-400",
+  cardio:   "border-l-orange-400",
+  rest:     "border-l-slate-300",
+};
+
+// Gradient classes for TodayPlan banner
+const PLAN_GRADIENT: Record<string, string> = {
+  shoulder: "from-violet-50 to-purple-100/60 border-violet-200",
+  leg:      "from-sky-50 to-blue-100/60 border-sky-200",
+  back:     "from-emerald-50 to-green-100/60 border-emerald-200",
+  cardio:   "from-orange-50 to-amber-100/60 border-orange-200",
+  rest:     "from-slate-50 to-slate-100/60 border-slate-200",
+};
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 export function formatDate(isoDate: string): string {
@@ -44,21 +62,44 @@ function totalVolume(entry: WorkoutEntry): number {
   return vol;
 }
 
+function totalDuration(entry: WorkoutEntry): number {
+  let dur = 0;
+  for (const ex of entry.exercises) {
+    if (isCardioExercise(ex)) dur += ex.duration;
+  }
+  return dur;
+}
+
+function getMondayISO(date: Date): string {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return localISO(d);
+}
+
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function TodayPlan({ dayOfWeek }: { dayOfWeek: number }) {
   const plan = WEEKLY_PLAN[dayOfWeek];
-  const colorClass = WORKOUT_COLORS[plan.types[0]] ?? WORKOUT_COLORS.rest;
+  const gradientClass = PLAN_GRADIENT[plan.types[0]] ?? PLAN_GRADIENT.rest;
   const icon = WORKOUT_ICONS[plan.types[0]] ?? "📅";
 
   return (
-    <div className={`rounded-2xl border px-5 py-5 transition-all duration-200 hover:scale-[1.01] shadow-sm ${colorClass}`}>
-      <p className="text-xs font-bold uppercase tracking-widest opacity-50 mb-2">
+    <div className={`rounded-2xl border bg-gradient-to-br px-5 py-5 transition-all duration-200 hover:scale-[1.01] shadow-sm ${gradientClass}`}>
+      <p className="text-xs font-bold uppercase tracking-widest opacity-50 mb-3">
         Today&apos;s Plan
       </p>
-      <div className="flex items-center gap-3">
-        <span className="text-3xl">{icon}</span>
-        <span className="text-2xl font-bold tracking-tight">{plan.label}</span>
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/70 shadow-sm text-3xl shrink-0">
+          {icon}
+        </div>
+        <div>
+          <p className="text-xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            {plan.label}
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5 font-medium">Scheduled for today</p>
+        </div>
       </div>
     </div>
   );
@@ -67,9 +108,10 @@ function TodayPlan({ dayOfWeek }: { dayOfWeek: number }) {
 export function WorkoutCard({ entry }: { entry: WorkoutEntry }) {
   const colorClass = WORKOUT_COLORS[entry.type] ?? WORKOUT_COLORS.rest;
   const icon = WORKOUT_ICONS[entry.type] ?? "📅";
+  const accentClass = CARD_ACCENT[entry.type] ?? CARD_ACCENT.rest;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md hover:shadow-sky-100/60 hover:-translate-y-0.5">
+    <div className={`rounded-2xl border-l-4 border border-slate-200 bg-white overflow-hidden shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md hover:shadow-sky-100/60 hover:-translate-y-0.5 ${accentClass}`}>
       {/* Card header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
         <div className="flex items-center gap-2">
@@ -133,10 +175,76 @@ export function WorkoutCard({ entry }: { entry: WorkoutEntry }) {
   );
 }
 
+function WeeklyStatBar({ workouts }: { workouts: WorkoutEntry[] }) {
+  const mondayISO = getMondayISO(new Date());
+  const sundayISO = localISO(new Date()); // today is the upper bound
+
+  const weekEntries = workouts.filter((w) => w.date >= mondayISO && w.date <= sundayISO);
+  const trainDays = weekEntries.filter((e) => e.type !== "rest").length;
+
+  if (trainDays === 0) return null;
+
+  const totalVol = weekEntries.reduce((acc, e) => acc + totalVolume(e), 0);
+  const STRENGTH_TYPES = new Set(["shoulder", "leg", "back"]);
+  const estMinutes = weekEntries.reduce((acc, e) => {
+    if (STRENGTH_TYPES.has(e.type)) return acc + 60;
+    if (e.type === "cardio") return acc + totalDuration(e);
+    return acc;
+  }, 0);
+  const estHours = Math.floor(estMinutes / 60);
+  const estMins  = estMinutes % 60;
+  const estLabel = estMinutes === 0 ? null
+    : estHours > 0 && estMins > 0 ? `${estHours}h ${estMins}m`
+    : estHours > 0 ? `${estHours}h`
+    : `${estMins}m`;
+
+  const stats = [
+    { value: `${trainDays}`, label: trainDays === 1 ? "workout" : "workouts" },
+    ...(totalVol > 0 ? [{ value: `${(totalVol / 1000).toFixed(1)}k lb`, label: "volume" }] : []),
+    ...(estLabel ? [{ value: estLabel, label: "gym time" }] : []),
+  ];
+
+  return (
+    <div className="rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-50 to-blue-50 px-5 py-3.5 shadow-sm">
+      <p className="text-xs font-bold uppercase tracking-widest text-sky-400 mb-2.5">This Week</p>
+      <div className="flex items-center gap-5 flex-wrap">
+        {stats.map(({ value, label }, i) => (
+          <div key={i} className="flex items-baseline gap-1.5">
+            <span className="text-lg font-extrabold text-sky-700 tabular-nums">{value}</span>
+            <span className="text-xs text-sky-500/70 font-semibold">{label}</span>
+            {i < stats.length - 1 && (
+              <span className="ml-3 text-sky-200 font-light select-none">·</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityBadge({ workouts }: { workouts: WorkoutEntry[] }) {
+  const mondayISO = getMondayISO(new Date());
+  const todayISO  = localISO(new Date());
+  const count = workouts.filter(
+    (w) => w.date >= mondayISO && w.date <= todayISO && w.type !== "rest"
+  ).length;
+
+  if (count === 0) return null;
+
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3.5 py-1.5 shadow-sm">
+      <span className="text-sm">🔥</span>
+      <span className="text-xs font-bold text-sky-700">
+        {count} workout{count !== 1 ? "s" : ""} this week
+      </span>
+    </div>
+  );
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const { getByDate, getRecent } = useWorkouts();
+  const { getByDate, getRecent, workouts } = useWorkouts();
 
   const now = new Date();
   const today = localISO(now);
@@ -147,17 +255,22 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8 animate-fade-up">
-      {/* Hero date header */}
-      <div className="pt-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-          Today
-        </p>
-        <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 leading-none">
-          {now.toLocaleDateString("en-US", { weekday: "long" })}
-        </h1>
-        <p className="mt-1.5 text-lg text-slate-500 font-medium">
-          {now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-        </p>
+      {/* Hero date header with gradient background */}
+      <div className="-mx-4 px-4 pt-6 pb-5 bg-gradient-to-b from-sky-50/80 to-transparent rounded-b-3xl">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+              Today
+            </p>
+            <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 leading-none">
+              {now.toLocaleDateString("en-US", { weekday: "long" })}
+            </h1>
+            <p className="mt-1.5 text-lg text-slate-500 font-medium">
+              {now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </p>
+          </div>
+          <ActivityBadge workouts={workouts} />
+        </div>
       </div>
 
       {/* Today's plan */}
@@ -176,10 +289,22 @@ export default function HomePage() {
           <p className="text-slate-400 text-sm mb-5">No workout logged for today yet.</p>
           <Link
             href="/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-sky-600 active:scale-95 transition-all duration-150 shadow-md shadow-sky-200"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:from-sky-600 hover:to-blue-700 active:scale-95 transition-all duration-150 shadow-md shadow-sky-200"
           >
             + Log Today&apos;s Workout
           </Link>
+        </div>
+      )}
+
+      {/* Weekly stat bar */}
+      <WeeklyStatBar workouts={workouts} />
+
+      {/* Divider */}
+      {recentWorkouts.length > 0 && (
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-slate-200" />
+          <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Recent</span>
+          <div className="flex-1 h-px bg-slate-200" />
         </div>
       )}
 
