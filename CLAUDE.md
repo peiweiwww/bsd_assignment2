@@ -9,10 +9,10 @@ A personal workout tracker app. Data in client-side state (no database yet).
 - React state for data (in memory, resets on refresh)
 
 ## Pages
-- `/` — Homepage: show today's workout plan, recent workout logs
-- `/new` — Add workout entry: pick date, workout type, add exercises with sets/reps/weight
-- `/day/[date]` — View a specific day's workout detail, with prev/next day navigation
-- `/week` — Weekly overview: 7-day grid showing each day's workout type and status
+- `/` — Homepage: today's date hero with streak badge, today's plan banner, today's workout log, weekly stats summary bar, recent workouts list
+- `/new` — Add workout: date picker, workout type selector with icons, dynamic exercise builder with sets/reps/weight, cardio mode with duration
+- `/day/[date]` — Day detail: full workout breakdown with set tables, planned vs logged view, prev/next navigation
+- `/week` — Week overview: 7-day grid with color-coded cards, weekly stats (workouts count, lbs lifted, est. gym time), legend
 
 ## Data Model
 - WorkoutEntry: { id, date, type (shoulder | leg | back | cardio | rest), exercises[] }
@@ -20,16 +20,18 @@ A personal workout tracker app. Data in client-side state (no database yet).
 - Set: { reps, weight }
 
 ## Weekly Schedule (default plan)
-- Monday: shoulder + abs
+- Monday: shoulder + abs (includes 2 abs exercises rotated from a pool of 6)
 - Tuesday: rest (class day)
 - Wednesday: rest (class day)
-- Thursday: leg + abs
+- Thursday: leg + abs (includes 2 abs exercises rotated from a pool of 6)
 - Friday: rest (class day)
 - Saturday: cardio
-- Sunday: back + abs
+- Sunday: back + abs (includes 2 abs exercises rotated from a pool of 6)
+
+Each strength day includes 2 abs exercises selected from 6 different abs exercises rotated across the 3 strength days.
 
 ## Style Preferences
+- Light, fresh blue sports theme — white/light gray background, sky blue accents, pastel workout type badges, clean and energetic feel
 - Clean, modern, minimal design
-- Dark or neutral color palette works well for a fitness app
 - Good typography and spacing
 - Mobile-friendly layout
