@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useWorkouts } from "@/lib/workout-context";
 import {
   WorkoutType,
@@ -268,9 +268,11 @@ function CardioExerciseBlock({
 
 export default function NewWorkoutPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { addWorkout } = useWorkouts();
 
-  const [date, setDate] = useState(todayISO());
+  const paramDate = searchParams.get("date");
+  const [date, setDate] = useState(paramDate && /^\d{4}-\d{2}-\d{2}$/.test(paramDate) ? paramDate : todayISO());
   const [workoutType, setWorkoutType] = useState<WorkoutType>("shoulder");
   const [strengthExercises, setStrengthExercises] = useState<FormStrengthExercise[]>([
     { id: uid(), name: "", sets: [{ reps: "", weight: "" }] },
@@ -380,7 +382,7 @@ export default function NewWorkoutPage() {
     };
 
     addWorkout(entry);
-    router.push("/");
+    router.push(paramDate ? `/day/${entry.date}` : "/");
   }
 
   const isStrength = isStrengthType(workoutType);
