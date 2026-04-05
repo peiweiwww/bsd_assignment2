@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useWorkouts } from "@/lib/workout-context";
+import { localISO } from "@/lib/utils";
 import {
   WorkoutType,
   StrengthExercise,
@@ -58,7 +59,7 @@ function uid() {
 }
 
 function todayISO() {
-  return new Date().toISOString().split("T")[0];
+  return localISO(new Date());   // ✅ local calendar date, no UTC shift
 }
 
 function isStrengthType(type: WorkoutType) {
@@ -91,7 +92,7 @@ function SetRow({
         placeholder="Reps"
         value={set.reps}
         onChange={(e) => onChange("reps", e.target.value)}
-        className="w-20 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+        className="w-20 rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 transition-colors"
       />
       <input
         type="number"
@@ -99,7 +100,7 @@ function SetRow({
         placeholder="Weight (lb)"
         value={set.weight}
         onChange={(e) => onChange("weight", e.target.value)}
-        className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+        className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 transition-colors"
       />
       {canRemove && (
         <button
@@ -148,7 +149,7 @@ function StrengthExerciseBlock({
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4 space-y-3 transition-colors hover:border-zinc-700">
       {/* Exercise header */}
       <div className="flex items-center gap-2">
         <span className="text-xs text-zinc-500 font-mono shrink-0">#{index + 1}</span>
@@ -157,7 +158,7 @@ function StrengthExerciseBlock({
           placeholder="Exercise name (e.g. Barbell Squat)"
           value={exercise.name}
           onChange={(e) => onChange({ ...exercise, name: e.target.value })}
-          className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+          className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 transition-colors"
         />
         {canRemove && (
           <button
@@ -216,7 +217,7 @@ function CardioExerciseBlock({
   canRemove: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4 space-y-3 transition-colors hover:border-zinc-700">
       <div className="flex items-center gap-2">
         <span className="text-xs text-zinc-500 font-mono shrink-0">#{index + 1}</span>
         <input
@@ -224,7 +225,7 @@ function CardioExerciseBlock({
           placeholder="Activity (e.g. Treadmill Run)"
           value={exercise.name}
           onChange={(e) => onChange({ ...exercise, name: e.target.value })}
-          className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+          className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 transition-colors"
         />
         {canRemove && (
           <button
@@ -389,31 +390,31 @@ export default function NewWorkoutPage() {
   const isCardio = workoutType === "cardio";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-up">
       {/* Page header */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-1">
+      <div className="pt-2">
+        <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
           New Entry
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Log Workout</h1>
+        <h1 className="text-5xl font-extrabold tracking-tight text-white leading-none">Log Workout</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Date */}
-        <section className="space-y-2">
-          <label className="block text-sm font-semibold text-zinc-300">Date</label>
+        <section className="space-y-2.5">
+          <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">Date</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             max={todayISO()}
-            className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 focus:border-zinc-500 focus:outline-none [color-scheme:dark]"
+            className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm font-medium text-zinc-100 transition-colors [color-scheme:dark]"
           />
         </section>
 
         {/* Workout type */}
         <section className="space-y-3">
-          <label className="block text-sm font-semibold text-zinc-300">
+          <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">
             Workout Type
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -424,7 +425,7 @@ export default function NewWorkoutPage() {
                   key={value}
                   type="button"
                   onClick={() => setWorkoutType(value)}
-                  className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors text-left ${
+                  className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-150 text-left active:scale-95 ${
                     active ? TYPE_COLORS[value] : TYPE_COLORS_INACTIVE
                   }`}
                 >
@@ -439,7 +440,7 @@ export default function NewWorkoutPage() {
         {/* Exercises — Strength */}
         {isStrength && (
           <section className="space-y-3">
-            <label className="block text-sm font-semibold text-zinc-300">
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">
               Exercises
             </label>
             <div className="space-y-3">
@@ -467,7 +468,7 @@ export default function NewWorkoutPage() {
         {/* Exercises — Cardio */}
         {isCardio && (
           <section className="space-y-3">
-            <label className="block text-sm font-semibold text-zinc-300">
+            <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500">
               Activities
             </label>
             <div className="space-y-3">
@@ -507,17 +508,17 @@ export default function NewWorkoutPage() {
         )}
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-2 pb-4">
           <button
             type="submit"
-            className="flex-1 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200 transition-colors"
+            className="flex-1 rounded-xl bg-white px-6 py-3 text-sm font-bold text-zinc-950 hover:bg-zinc-100 active:scale-95 transition-all duration-150 shadow-lg shadow-white/10"
           >
             Save Workout
           </button>
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="rounded-xl border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-400 hover:border-zinc-500 hover:text-zinc-200 transition-colors"
+            className="rounded-xl border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-400 hover:border-zinc-500 hover:text-white hover:bg-zinc-800/50 active:scale-95 transition-all duration-150"
           >
             Cancel
           </button>

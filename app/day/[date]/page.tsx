@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useWorkouts } from "@/lib/workout-context";
 import { WEEKLY_PLAN, isCardioExercise, WorkoutEntry } from "@/lib/types";
+import { localISO } from "@/lib/utils";
 
-// ── Constants (mirrors page.tsx) ───────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────────────────────
 
 const WORKOUT_COLORS: Record<string, string> = {
   shoulder: "bg-violet-500/15 text-violet-300 border-violet-500/30",
@@ -25,7 +26,6 @@ const WORKOUT_ICONS: Record<string, string> = {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-/** Parse an ISO date string as a local date (avoids UTC offset issues). */
 function parseLocalDate(iso: string): Date {
   const [year, month, day] = iso.split("-").map(Number);
   return new Date(year, month - 1, day);
@@ -40,10 +40,11 @@ function formatHeading(iso: string): string {
   });
 }
 
+/** Shift an ISO date by `days` using local calendar arithmetic. */
 function shiftDate(iso: string, days: number): string {
   const d = parseLocalDate(iso);
   d.setDate(d.getDate() + days);
-  return d.toISOString().split("T")[0];
+  return localISO(d);   // ✅ local-safe
 }
 
 function totalVolume(entry: WorkoutEntry): number {
@@ -64,10 +65,10 @@ function PlannedBadge({ dayOfWeek }: { dayOfWeek: number }) {
   const icon = WORKOUT_ICONS[plan.types[0]] ?? "📅";
 
   return (
-    <div className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 ${colorClass}`}>
-      <span className="text-lg">{icon}</span>
+    <div className={`inline-flex items-center gap-3 rounded-xl border px-4 py-3 ${colorClass}`}>
+      <span className="text-xl">{icon}</span>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest opacity-70 leading-none mb-0.5">
+        <p className="text-xs font-bold uppercase tracking-widest opacity-60 leading-none mb-0.5">
           Planned
         </p>
         <p className="text-sm font-bold leading-none">{plan.label}</p>
@@ -82,13 +83,15 @@ function WorkoutDetail({ entry }: { entry: WorkoutEntry }) {
   const vol = totalVolume(entry);
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 overflow-hidden">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 overflow-hidden shadow-lg shadow-black/20">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-800">
         <span className="text-2xl">{icon}</span>
         <div>
-          <h2 className="font-semibold text-zinc-100 capitalize text-lg leading-tight">
-            {entry.type === "rest" ? "Rest Day" : `${entry.type.charAt(0).toUpperCase() + entry.type.slice(1)} Workout`}
+          <h2 className="font-bold text-zinc-100 capitalize text-lg leading-tight">
+            {entry.type === "rest"
+              ? "Rest Day"
+              : `${entry.type.charAt(0).toUpperCase() + entry.type.slice(1)} Workout`}
           </h2>
           {vol > 0 && (
             <p className="text-xs text-zinc-500 mt-0.5">
@@ -97,7 +100,7 @@ function WorkoutDetail({ entry }: { entry: WorkoutEntry }) {
             </p>
           )}
         </div>
-        <span className={`ml-auto rounded-full border px-3 py-1 text-xs font-medium ${colorClass}`}>
+        <span className={`ml-auto rounded-full border px-3 py-1 text-xs font-semibold ${colorClass}`}>
           {entry.exercises.length} exercise{entry.exercises.length !== 1 ? "s" : ""}
         </span>
       </div>
@@ -110,56 +113,53 @@ function WorkoutDetail({ entry }: { entry: WorkoutEntry }) {
               {isCardioExercise(ex) ? (
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-zinc-100">{ex.name}</span>
-                    <span className="text-sm font-semibold text-zinc-300 tabular-nums">
+                    <span className="font-semibold text-zinc-100">{ex.name}</span>
+                    <span className="text-sm font-bold text-zinc-300 tabular-nums bg-zinc-800 px-2.5 py-0.5 rounded-lg">
                       {ex.duration} min
                     </span>
                   </div>
                   {ex.notes && (
-                    <p className="text-xs text-zinc-500 italic">{ex.notes}</p>
+                    <p className="text-xs text-zinc-500 italic mt-1">{ex.notes}</p>
                   )}
                 </div>
               ) : (
-                <div className="space-y-2.5">
-                  {/* Exercise name + set count */}
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-zinc-100">{ex.name}</span>
-                    <span className="text-xs text-zinc-500">{ex.sets.length} sets</span>
+                    <span className="font-semibold text-zinc-100">{ex.name}</span>
+                    <span className="text-xs text-zinc-600 font-medium">{ex.sets.length} sets</span>
                   </div>
 
                   {/* Sets table */}
-                  <div className="rounded-lg overflow-hidden border border-zinc-800">
-                    {/* Column headers */}
-                    <div className="grid grid-cols-3 bg-zinc-800/60 px-3 py-1.5 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  <div className="rounded-xl overflow-hidden border border-zinc-800">
+                    <div className="grid grid-cols-3 bg-zinc-800/70 px-3 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
                       <span>Set</span>
                       <span className="text-center">Reps</span>
                       <span className="text-right">Weight</span>
                     </div>
-                    {/* Set rows */}
                     {ex.sets.map((s, si) => (
                       <div
                         key={si}
-                        className={`grid grid-cols-3 px-3 py-2 text-sm ${
-                          si % 2 === 0 ? "bg-zinc-900" : "bg-zinc-900/40"
+                        className={`grid grid-cols-3 px-3 py-2.5 text-sm transition-colors ${
+                          si % 2 === 0 ? "bg-zinc-900" : "bg-zinc-900/50"
                         }`}
                       >
-                        <span className="text-zinc-500 font-mono">{exIdx + 1}.{si + 1}</span>
-                        <span className="text-center text-zinc-200 font-medium tabular-nums">
+                        <span className="text-zinc-600 font-mono text-xs">{exIdx + 1}.{si + 1}</span>
+                        <span className="text-center text-zinc-200 font-bold tabular-nums">
                           {s.reps}
                         </span>
-                        <span className="text-right text-zinc-300 font-medium tabular-nums">
+                        <span className="text-right text-zinc-300 font-bold tabular-nums">
                           {s.weight === 0 ? "BW" : `${s.weight} lb`}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Per-exercise volume */}
                   {(() => {
                     const exVol = ex.sets.reduce((acc, s) => acc + s.reps * s.weight, 0);
                     return exVol > 0 ? (
-                      <p className="text-xs text-zinc-600 text-right">
-                        Volume: <span className="text-zinc-400">{exVol.toLocaleString()} lb</span>
+                      <p className="text-xs text-zinc-700 text-right">
+                        Volume:{" "}
+                        <span className="text-zinc-500 font-semibold">{exVol.toLocaleString()} lb</span>
                       </p>
                     ) : null;
                   })()}
@@ -169,7 +169,7 @@ function WorkoutDetail({ entry }: { entry: WorkoutEntry }) {
           ))}
         </ul>
       ) : (
-        <div className="px-5 py-8 text-center text-sm text-zinc-500">
+        <div className="px-5 py-10 text-center text-sm text-zinc-500">
           No exercises recorded — enjoy the rest!
         </div>
       )}
@@ -184,7 +184,6 @@ export default function DayPage() {
   const date = Array.isArray(params.date) ? params.date[0] : params.date;
   const { getByDate } = useWorkouts();
 
-  // Validate date format
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return (
       <div className="text-center py-20 text-zinc-500">
@@ -195,38 +194,38 @@ export default function DayPage() {
 
   const localDate = parseLocalDate(date);
   const dayOfWeek = localDate.getDay();
-  const heading = formatHeading(date);
-  const prevDate = shiftDate(date, -1);
-  const nextDate = shiftDate(date, 1);
-  const today = new Date().toISOString().split("T")[0];
-  const isToday = date === today;
+  const heading   = formatHeading(date);
+  const prevDate  = shiftDate(date, -1);
+  const nextDate  = shiftDate(date, 1);
+  const today     = localISO(new Date());   // ✅ local-safe
+  const isToday   = date === today;
 
   const entry = getByDate(date);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-up">
       {/* Prev / Next navigation */}
       <div className="flex items-center justify-between">
         <Link
           href={`/day/${prevDate}`}
-          className="flex items-center gap-1.5 rounded-xl border border-zinc-700 px-3 py-2 text-sm text-zinc-400 hover:border-zinc-500 hover:text-zinc-200 transition-colors"
+          className="flex items-center gap-1.5 rounded-xl border border-zinc-700 px-3.5 py-2 text-sm font-medium text-zinc-400 hover:border-zinc-500 hover:text-white hover:bg-zinc-800/50 active:scale-95 transition-all duration-150"
         >
           ← Prev
         </Link>
 
         <Link
           href="/"
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="text-xs font-medium text-zinc-600 hover:text-zinc-300 transition-colors"
         >
           ↑ Home
         </Link>
 
         <Link
           href={`/day/${nextDate}`}
-          className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm transition-colors ${
+          className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-all duration-150 ${
             nextDate > today
               ? "border-zinc-800 text-zinc-700 cursor-not-allowed pointer-events-none"
-              : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200"
+              : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white hover:bg-zinc-800/50 active:scale-95"
           }`}
         >
           Next →
@@ -234,13 +233,13 @@ export default function DayPage() {
       </div>
 
       {/* Date heading */}
-      <div>
+      <div className="pt-1">
         {isToday && (
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-1">
+          <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">
             Today
           </p>
         )}
-        <h1 className="text-3xl font-bold tracking-tight text-white leading-tight">
+        <h1 className="text-4xl font-extrabold tracking-tight text-white leading-tight">
           {heading}
         </h1>
       </div>
@@ -252,17 +251,17 @@ export default function DayPage() {
       {entry ? (
         <WorkoutDetail entry={entry} />
       ) : (
-        <div className="rounded-2xl border border-dashed border-zinc-700 px-5 py-10 text-center space-y-4">
-          <p className="text-zinc-400 text-base font-medium">No workout logged for this day.</p>
+        <div className="rounded-2xl border border-dashed border-zinc-700/80 px-5 py-12 text-center space-y-4 hover:border-zinc-600 transition-colors">
+          <p className="text-zinc-400 text-base font-semibold">No workout logged for this day.</p>
           <p className="text-zinc-600 text-sm">
             {date <= today
               ? "Did you work out? Add it now."
-              : "This day is in the future — come back later!"}
+              : "This day hasn't happened yet — come back later!"}
           </p>
           {date <= today && (
             <Link
               href={`/new?date=${date}`}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-zinc-200 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-zinc-950 hover:bg-zinc-100 active:scale-95 transition-all duration-150 shadow-lg shadow-white/10"
             >
               + Log Workout for This Day
             </Link>
