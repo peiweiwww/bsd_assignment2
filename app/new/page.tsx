@@ -407,7 +407,6 @@ export default function NewWorkoutPage() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            max={todayISO()}
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm font-medium text-zinc-100 transition-colors [color-scheme:dark]"
           />
         </section>

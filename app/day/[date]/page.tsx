@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useWorkouts } from "@/lib/workout-context";
-import { WEEKLY_PLAN, isCardioExercise, WorkoutEntry } from "@/lib/types";
+import { WEEKLY_PLAN, WORKOUT_TYPE_LABELS, isCardioExercise, WorkoutEntry } from "@/lib/types";
 import { localISO } from "@/lib/utils";
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -88,10 +88,8 @@ function WorkoutDetail({ entry }: { entry: WorkoutEntry }) {
       <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-800">
         <span className="text-2xl">{icon}</span>
         <div>
-          <h2 className="font-bold text-zinc-100 capitalize text-lg leading-tight">
-            {entry.type === "rest"
-              ? "Rest Day"
-              : `${entry.type.charAt(0).toUpperCase() + entry.type.slice(1)} Workout`}
+          <h2 className="font-bold text-zinc-100 text-lg leading-tight">
+            {WORKOUT_TYPE_LABELS[entry.type]}
           </h2>
           {vol > 0 && (
             <p className="text-xs text-zinc-500 mt-0.5">

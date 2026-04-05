@@ -220,7 +220,20 @@ export default function WeekPage() {
 
   const trainDays = weekEntries.filter((e) => e.type !== "rest").length;
   const totalVol  = weekEntries.reduce((acc, e) => acc + totalVolume(e), 0);
-  const totalDur  = weekEntries.reduce((acc, e) => acc + totalDuration(e), 0);
+
+  // Estimated total workout time: 60 min per strength session, 45 min per cardio
+  const STRENGTH_TYPES = new Set(["shoulder", "leg", "back"]);
+  const estMinutes = weekEntries.reduce((acc, e) => {
+    if (STRENGTH_TYPES.has(e.type)) return acc + 60;
+    if (e.type === "cardio") return acc + 45;
+    return acc;
+  }, 0);
+  const estHours = Math.floor(estMinutes / 60);
+  const estMins  = estMinutes % 60;
+  const estLabel = estMinutes === 0 ? "—"
+    : estHours > 0 && estMins > 0 ? `${estHours}h ${estMins}m`
+    : estHours > 0 ? `${estHours}h`
+    : `${estMins}m`;
 
   function prevWeek() { setWeekStart((d) => addDays(d, -7)); }
   function nextWeek() { setWeekStart((d) => addDays(d, 7)); }
@@ -273,9 +286,9 @@ export default function WeekPage() {
       {weekEntries.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Workouts",     value: `${trainDays}`,                                          sub: "this week" },
-            { label: "Volume",       value: totalVol > 0 ? `${(totalVol / 1000).toFixed(1)}k` : "—", sub: "lbs lifted" },
-            { label: "Cardio",       value: totalDur > 0 ? `${totalDur} min` : "—",                  sub: "total time" },
+            { label: "Workouts", value: `${trainDays}`,                                           sub: "this week" },
+            { label: "Volume",   value: totalVol > 0 ? `${(totalVol / 1000).toFixed(1)}k` : "—", sub: "lbs lifted" },
+            { label: "Time",     value: estLabel,                                                  sub: "est. gym time" },
           ].map(({ label, value, sub }) => (
             <div
               key={label}

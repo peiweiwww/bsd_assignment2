@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useWorkouts } from "@/lib/workout-context";
-import { WEEKLY_PLAN, WorkoutEntry, isCardioExercise } from "@/lib/types";
+import { WEEKLY_PLAN, WORKOUT_TYPE_LABELS, WorkoutEntry, isCardioExercise } from "@/lib/types";
 import { localISO } from "@/lib/utils";
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export function WorkoutCard({ entry }: { entry: WorkoutEntry }) {
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800">
         <div className="flex items-center gap-2">
           <span className="text-lg">{icon}</span>
-          <span className="font-semibold text-zinc-100 capitalize">{entry.type}</span>
+          <span className="font-semibold text-zinc-100">{WORKOUT_TYPE_LABELS[entry.type]}</span>
           <span className={`ml-1 rounded-full border px-2 py-0.5 text-xs font-medium ${colorClass}`}>
             {entry.exercises.length} exercise{entry.exercises.length !== 1 ? "s" : ""}
           </span>

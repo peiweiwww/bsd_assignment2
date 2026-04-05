@@ -35,6 +35,7 @@ export const sampleWorkouts: WorkoutEntry[] = [
           { reps: 10, weight: 20 },
         ],
       },
+      // Abs
       {
         id: "e4",
         name: "Cable Crunch",
@@ -42,6 +43,15 @@ export const sampleWorkouts: WorkoutEntry[] = [
           { reps: 15, weight: 50 },
           { reps: 15, weight: 50 },
           { reps: 12, weight: 55 },
+        ],
+      },
+      {
+        id: "e4b",
+        name: "Hanging Leg Raise",
+        sets: [
+          { reps: 15, weight: 0 },
+          { reps: 12, weight: 0 },
+          { reps: 12, weight: 0 },
         ],
       },
     ],
@@ -81,6 +91,7 @@ export const sampleWorkouts: WorkoutEntry[] = [
           { reps: 10, weight: 290 },
         ],
       },
+      // Abs
       {
         id: "e8",
         name: "Hanging Leg Raise",
@@ -88,6 +99,24 @@ export const sampleWorkouts: WorkoutEntry[] = [
           { reps: 15, weight: 0 },
           { reps: 12, weight: 0 },
           { reps: 12, weight: 0 },
+        ],
+      },
+      {
+        id: "e8b",
+        name: "Plank",
+        sets: [
+          { reps: 1, weight: 0 },
+          { reps: 1, weight: 0 },
+          { reps: 1, weight: 0 },
+        ],
+      },
+      {
+        id: "e8c",
+        name: "Cable Crunch",
+        sets: [
+          { reps: 15, weight: 50 },
+          { reps: 15, weight: 50 },
+          { reps: 12, weight: 55 },
         ],
       },
     ],
@@ -114,7 +143,7 @@ export const sampleWorkouts: WorkoutEntry[] = [
     ],
   },
 
-  // Sunday — Back + Abs
+  // Sunday March 29 — Back + Abs
   {
     id: "w4",
     date: "2026-03-29",
@@ -147,12 +176,86 @@ export const sampleWorkouts: WorkoutEntry[] = [
           { reps: 10, weight: 130 },
         ],
       },
+      // Abs
       {
         id: "e14",
         name: "Plank",
         sets: [
           { reps: 1, weight: 0 },
           { reps: 1, weight: 0 },
+        ],
+      },
+      {
+        id: "e14b",
+        name: "Hanging Leg Raise",
+        sets: [
+          { reps: 15, weight: 0 },
+          { reps: 12, weight: 0 },
+          { reps: 12, weight: 0 },
+        ],
+      },
+      {
+        id: "e14c",
+        name: "Russian Twist",
+        sets: [
+          { reps: 20, weight: 25 },
+          { reps: 20, weight: 25 },
+          { reps: 15, weight: 25 },
+        ],
+      },
+    ],
+  },
+
+  // Sunday April 5 (today) — Back + Abs
+  {
+    id: "w5",
+    date: "2026-04-05",
+    type: "back",
+    exercises: [
+      {
+        id: "e15",
+        name: "Deadlift",
+        sets: [
+          { reps: 5, weight: 225 },
+          { reps: 5, weight: 225 },
+          { reps: 3, weight: 245 },
+        ],
+      },
+      {
+        id: "e16",
+        name: "Pull-Up",
+        sets: [
+          { reps: 10, weight: 0 },
+          { reps: 9,  weight: 0 },
+          { reps: 8,  weight: 0 },
+        ],
+      },
+      {
+        id: "e17",
+        name: "Seated Cable Row",
+        sets: [
+          { reps: 12, weight: 120 },
+          { reps: 12, weight: 120 },
+          { reps: 10, weight: 130 },
+        ],
+      },
+      // Abs
+      {
+        id: "e18",
+        name: "Hanging Leg Raise",
+        sets: [
+          { reps: 15, weight: 0 },
+          { reps: 12, weight: 0 },
+          { reps: 12, weight: 0 },
+        ],
+      },
+      {
+        id: "e19",
+        name: "Russian Twist",
+        sets: [
+          { reps: 20, weight: 25 },
+          { reps: 20, weight: 25 },
+          { reps: 15, weight: 25 },
         ],
       },
     ],

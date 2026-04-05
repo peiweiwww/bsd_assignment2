@@ -31,6 +31,15 @@ export interface WorkoutEntry {
   exercises: Exercise[];
 }
 
+/** Human-readable label for each workout type (used on cards and detail pages). */
+export const WORKOUT_TYPE_LABELS: Record<WorkoutType, string> = {
+  shoulder: "Shoulder + Abs",
+  leg:      "Leg + Abs",
+  back:     "Back + Abs",
+  cardio:   "Cardio",
+  rest:     "Rest Day",
+};
+
 // Maps day of week (0=Sun, 1=Mon, ..., 6=Sat) to planned workout type(s)
 export const WEEKLY_PLAN: Record<number, { types: WorkoutType[]; label: string }> = {
   0: { types: ["back"],     label: "Back + Abs" },
